@@ -1,0 +1,35 @@
+# 忽略 dist 文件夹
+dist/
+# 忽略 .env 文件
+#.env
+# 忽略 .vscode 文件夹
+#.vscode/
+# 忽略 .git 文件夹
+#.git/
+
+# 忽略文件
+gradio_main.spec
+data.db
+demo.py
+
+# 忽略文件夹
+build/
+app/
+gradle/
+
+# 忽略以 .log 结尾的文件
+*.log
+*.mp4
+*.mp3
+*.wav
+*.flac
+*.aac
+*.ogg
+*.wma
+*.m4a
+*.webm
+*.mkv
+*.avi
+*.mov
+*.xlsx
+
