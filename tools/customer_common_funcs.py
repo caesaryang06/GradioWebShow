@@ -8,6 +8,8 @@ import datetime
 import hashlib
 import tempfile
 import zipfile
+import pdfplumber
+import pandas as pd
 
 
 # 传入dataframe导出数据到Excel文件
@@ -168,6 +170,50 @@ def zip_all_files(files, zip_name):
         for file in files:
             zipf.write(file)
 
+
+# 提取pdf文件中的内容并写入到excel中
+def extract_table_from_pdf(pdf_path, output_excel_path):
+    tables = []  # List to hold all extracted tables
+
+    # Open the PDF file
+    with pdfplumber.open(pdf_path) as pdf:
+        # Iterate through each page
+        for page_num, page in enumerate(pdf.pages):
+            # Extract tables from the page
+            table = page.extract_table()
+
+            # If a table is found, process it
+            if table:
+
+                # 对table进行基本的处理
+                tb = []
+                for row in table:
+                    tb.append([c for c in row if c and len(c) > 0 ])
+
+                # Convert table to DataFrame without assuming the first row as headers
+                df = pd.DataFrame(tb)
+
+                # Set custom column names if the header row is unreliable
+                df.columns = [f"Column_{i}" for i in range(df.shape[1])]
+
+                # Drop duplicate column names (if any)
+                df = df.loc[:, ~df.columns.duplicated()]
+
+                tables.append(df)
+                print(f"Table extracted from page {page_num + 1}")
+
+    # Concatenate all tables into one DataFrame
+    if tables:
+        full_table = pd.concat(tables, ignore_index=True)
+
+        # 删除第一行
+        full_table = full_table.drop(index=0).reset_index(drop=True)
+
+        # Write the DataFrame to an Excel file
+        full_table.to_excel(output_excel_path, index=False)
+        print(f"Data written to {output_excel_path}")
+    else:
+        print("No tables found in the PDF.")
 
 
 

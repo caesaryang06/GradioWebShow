@@ -16,6 +16,7 @@ demo.py
 build/
 app/
 gradle/
+out/
 
 # 忽略以 .log 结尾的文件
 *.log
@@ -32,4 +33,5 @@ gradle/
 *.avi
 *.mov
 *.xlsx
+*.pyc
 

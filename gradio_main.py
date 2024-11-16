@@ -1,5 +1,5 @@
 import gradio as gr
-from tabs import tab1_info, tab2_info, tab5_info, tab6_info, tab8_info, tab9_info
+from tabs import tab1_info, tab2_info, tab5_info, tab6_info, tab8_info, tab9_info, tab10_info, tab11_info, tab12_info
 import sys
 from tools import customer_common_funcs as ccf
 
@@ -30,6 +30,12 @@ if __name__ == "__main__":
                 tab8_info.func()
             with gr.Tab("提示词管理"):
                 tab9_info.func()
+            with gr.Tab("语音实验室"):
+                tab10_info.func()
+            with gr.Tab("AZURE文本转语音"):
+                tab11_info.func()
+            with gr.Tab("PDF2EXCEL"):
+                tab12_info.func()
 
     if sys.platform == 'linux':
         app.launch(inbrowser=True, auth=login, share=True)
