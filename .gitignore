@@ -35,3 +35,6 @@ out/
 *.xlsx
 *.pyc
 
+
+#忽略指定文件
+schedule.py
