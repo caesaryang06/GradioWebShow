@@ -1,0 +1,12 @@
+该项目使用说明
+
+1. git clone github 下载
+
+2. 安装依赖  pip -r requirements.txt
+
+3 处理sqlite数据库
+   3.1  下载加解密工具   https://github.com/caesaryang06/CipherBox/tree/main/dist
+   3.2  运行加解密工具
+   3.3  上传当前项目下的 encrypted.db  加密文件  解密后存放到当前项目根目录下 并指定存储文件的名称为 data.db
+
+4. 运行gradio_main.py

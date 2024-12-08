@@ -10,6 +10,7 @@ import os
 voices_info = [
     ( "zh-CN-YunxiNeural", "男性", "大陆普通话"),
     ( "zh-CN-XiaochenNeural", "女性", "大陆普通话"),
+    ("zh-CN-YunzeNeural", "男性", "大陆普通话 纪录片,社会知识类型，音频书籍"),
     ("en-US-Brian:DragonHDLatestNeural", "男性", "美式英语"),
     ("en-US-Aria:DragonHDLatestNeural", "女性", "美式英语"),
 

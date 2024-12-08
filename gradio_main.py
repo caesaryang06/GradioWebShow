@@ -1,7 +1,6 @@
 import gradio as gr
-from tabs import tab1_info, tab2_info, tab5_info, tab6_info, tab8_info, tab9_info, tab10_info, tab11_info, tab12_info
+from tabs import tab1_info, tab2_info, tab5_info, tab6_info, tab8_info, tab9_info, tab10_info, tab11_info, tab12_info, tab13_info
 import sys
-from tools import customer_common_funcs as ccf
 
 # 加载 .env 文件
 from dotenv import load_dotenv, find_dotenv
@@ -36,6 +35,8 @@ if __name__ == "__main__":
                 tab11_info.func()
             with gr.Tab("PDF2EXCEL"):
                 tab12_info.func()
+            with gr.Tab("comfyui工作流"):
+                tab13_info.func()             
 
     if sys.platform == 'linux':
         app.launch(inbrowser=True, auth=login, share=True)

@@ -10,7 +10,7 @@ import tempfile
 import zipfile
 import pdfplumber
 import pandas as pd
-
+import base64
 
 # 传入dataframe导出数据到Excel文件
 def export_to_excel(df):
@@ -41,6 +41,36 @@ def delete_old_files(directory):
                 print(f"Deleted {file_path}")
 
 
+def base64_encode(data):
+    """
+    对输入的数据进行base64编码，并返回字符串类型的编码结果
+    :param data: 要编码的数据，可以是字符串或者字节类型
+    :return: 编码后的base64字符串（字符串类型）
+    """
+    if isinstance(data, str):
+        # 如果是字符串，先转换为字节类型（默认使用utf-8编码，可根据实际情况调整）
+        data = data.encode('utf-8')
+    encoded_data = base64.b64encode(data)
+    # 将字节类型的编码结果转换为字符串类型
+    return encoded_data.decode('utf-8')
+
+
+def base64_decode(encoded_data):
+    """
+    对输入的base64编码字符串进行解码
+    :param encoded_data: 要解码的base64编码字符串
+    :return: 解码后的数据，可以是字节类型或者根据情况转换为字符串类型
+    """
+    if isinstance(encoded_data, str):
+        # 如果传入的是字符串类型，先转换为字节类型（默认使用utf-8编码，可根据实际情况调整）
+        encoded_data = encoded_data.encode('utf-8')
+    decoded_data = base64.b64decode(encoded_data)
+    try:
+        # 尝试将解码后的字节数据转换为字符串（默认使用utf-8解码，可根据实际情况调整）
+        return decoded_data.decode('utf-8')
+    except UnicodeDecodeError:
+        # 如果解码为字符串失败，说明可能不是文本数据，直接返回字节数据
+        return decoded_data
 
 
 
