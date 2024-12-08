@@ -1,6 +1,6 @@
 pushcode.bat pushcode.sh  这两个脚本
 
-这两个脚本的作用是：
+这两个脚本作用是：
 1. pushcode.bat：用于在Windows系统上执行git push命令，将代码推送到远程仓库。【包括github和gitee两个仓库】
 2. pushcode.sh：用于在Linux或Mac系统上执行git push命令，将代码推送到远程仓库。
 
