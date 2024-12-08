@@ -1,5 +1,5 @@
 import subprocess
-
+import sys
 
 '''
 脚本说明：  该脚本用于加密数据库文件，并提交到github和gitee
@@ -57,11 +57,11 @@ def git_commit(repo_path, message):
 
 
 
-def main():
+def main(key):
 
     # 加密文件
     run_exe("D:/soft/Windows加密解密工具.exe",
-            ["1", "011019", "D:/vscode-pro/GradioWebShow/data.db", "D:/vscode-pro/GradioWebShow/encrypted.db"], cwd="C:/Users/yangxinmin")
+            ["1", key, "D:/vscode-pro/GradioWebShow/data.db", "D:/vscode-pro/GradioWebShow/encrypted.db"], cwd="C:/Users/yangxinmin")
 
    
     # 提交加密后的数据库文件到github和gitee
@@ -69,4 +69,9 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+  if len(sys.argv) < 2:
+    print("请提供密钥参数。。。")
+    sys.exit(1)
+
+  key = sys.argv[1]
+  main(key)
