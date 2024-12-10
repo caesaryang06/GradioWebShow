@@ -6,52 +6,39 @@ import os
 from tools.encryption_tool import *
 
 
+
+# 若不存在  则为添加  若存在  则忽略创建操作
 def createTable():
+    '''
+    若不存在  则为添加  若存在  则忽略创建操作
+    '''
     db = SqliteTool('data.db')
-    db.delete_table('comfyui_workflow')
+
+    # emails
+    db.create_table('emails',
+                    'email_address TEXT, email_password TEXT')
+    
+
+    # url_mapping
+    db.create_table('url_mapping',
+                    'uuid TEXT, short_url TEXT, long_url TEXT')
+    
+
+    # prompt_table
+    db.create_table('prompt_table',
+                    'uuid TEXT, category TEXT, serial_number TEXT, prompt TEXT')
+    
+    # comfyui_workflow
     db.create_table('comfyui_workflow',
                     'workflow TEXT NOT NULL,inputs TEXT NOT NULL,content TEXT NOT NULL')
-
-
-
-def insert():
-    db = SqliteTool('data.db')
-    db.insert('prompt_table', {'uuid': '1234',
-              'category': 'a', 'serial_number': 1, 'prompt': 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'})
-    db.insert('prompt_table', {'uuid': '1235',
-                               'category': 'a', 'serial_number': 2, 'prompt': 'ccccccccccccccccccccccccccccccccccccc'})
-    db.insert('prompt_table', {'uuid': '1236',
-                               'category': 'a', 'serial_number': 3, 'prompt': 'dddddddddddddddddddddddddddddddddddddddd'})
     
-   
+    # software_accounts
+    db.create_table('software_accounts',
+                    'uuid TEXT, software_name TEXT, account TEXT, password TEXT, is_available TEXT, remark TEXT')
 
-def delete_record():
-    db = SqliteTool('data.db')
-    db.delete("url_mapping",
-              "uuid='03a017cdadb6c4a1f487dcaa5e3493ddf9eff724e737bf1c195892d9b0726d1b'")
-
-
-def demo01():
-    EncryptionUtils.encrypt_file('data.db', 'encrypted.db')
-
-
-def demo02():
-    key = 'KuCecPma4NaOBOoaFMe_lH_iki5xS6SK3738dPnsd98='
-    EncryptionUtils.decrypt_file(key, 'encrypted.db', 'test.db')
 
 
 if __name__ == '__main__':
     createTable()
-    #insert()
-    #delete_record()
-    # demo01()
-    # demo02()
-    # conn = sqlite3.connect('test.db')
-    # # 读取表数据到DataFrame
-    # promptDF = pd.read_sql(
-    #     'SELECT uuid,category,serial_number,prompt FROM prompt_table', conn)
-    
-    # print(promptDF)
-    # key = os.environ.get('DB_ENCRYPTION_KEY')
-    # print(key)
+
 

@@ -1,12 +1,16 @@
 该项目使用说明如下
 
-1. git clone github 下载
+1. git clone  下载
 
-2. 安装依赖  pip -r requirements.txt
+2. 创建conda环境并激活 python版本为：3.10
 
-3 处理sqlite数据库
-   3.1  下载加解密工具   https://github.com/caesaryang06/CipherBox/tree/main/dist
-   3.2  运行加解密工具
-   3.3  上传当前项目下的 encrypted.db  加密文件  解密后存放到当前项目根目录下 并指定存储文件的名称为 data.db
+3. 安装依赖  pip -r requirements.txt
 
-4. 运行gradio_main.py
+4. 解密数据库文件  没密钥跳过这一步
+python encrypt4file.py decrypt4file xxxxxx  xxxxx为解密密钥
+
+5. 更新数据库  主要是创建数据库中不存在的表
+python sqlite_main.py
+
+
+6. 运行gradio_main.py
