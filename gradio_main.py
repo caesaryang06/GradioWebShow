@@ -38,7 +38,9 @@ if __name__ == "__main__":
             with gr.Tab("comfyui工作流"):
                 tab13_info.func()             
 
-    if sys.platform == 'linux':
-        app.launch(inbrowser=True, auth=login, share=True)
-    else:
-        app.launch(inbrowser=True, auth=login, share=False)
+    # 若在google云盘启动  使用如下代码
+    #app.launch(inbrowser=True, auth=login, share=True)
+        
+
+    # 本地运行代码
+    app.launch(inbrowser=True, auth=login, share=False)
