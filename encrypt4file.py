@@ -12,7 +12,7 @@ def encrypt4file(keystr):
     key = EncryptionUtils.decrypt(ccf.getkey(keystr), DECRYPT_KEY)
 
     # 加密文件
-    EncryptionUtils.encrypt_file(key, 'data.db', 'encrypted.db')
+    EncryptionUtils.encrypt_file(key, 'data.db', 'db/encrypted.db')
 
 
 def decrypt4file(keystr):
