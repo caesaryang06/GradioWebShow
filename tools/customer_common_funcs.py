@@ -246,8 +246,24 @@ def extract_table_from_pdf(pdf_path, output_excel_path):
         print("No tables found in the PDF.")
 
 
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
 
 
+# 传入字符串 如果字符串为integer则返回int类型，如果为float则返回float类型，否则返回字符串类型
+def determine_type(s):
+    if is_number(s):
+        try:
+            int(s)
+            return "int"
+        except ValueError:
+            return "float"
+    else:
+        return "string"
 
 
 

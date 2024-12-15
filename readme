@@ -13,4 +13,9 @@ python encrypt4file.py decrypt4file xxxxxx  xxxxx为解密密钥
 python sqlite_main.py
 
 
+6. 配置环境变量 
+AZURE_REGION=eastus
+AZURE_SUBSCRIPTION_KEY=xxxxxxxxxxxxxxxx
+
+
 6. 运行gradio_main.py

@@ -5,6 +5,7 @@ import json
 import requests
 import pandas as pd
 import re
+import os 
 
 # 假设ComfyUI API的URL
 API_URL = "http://127.0.0.1:8188/prompt"
@@ -45,14 +46,19 @@ def get_value_from_json(json_obj, input_str):
 
 def set_value_for_json(json_obj, input_key, input_value):
     result = re.findall(r"\d+|[a-zA-Z_]+", input_key)
-    json_obj[result[0]][result[1]][result[2]] = input_value
-
+    typeStr = ccf.determine_type(input_value)
+    if "int" == typeStr:
+        json_obj[result[0]][result[1]][result[2]] = int(input_value)
+    elif "float" == typeStr:
+        json_obj[result[0]][result[1]][result[2]] = float(input_value)
+    else:
+        json_obj[result[0]][result[1]][result[2]] = input_value
 
 # 导入工作流
 def import_workflow(json_file, import_records, workflow_name):
     work_names = []
     try:
-        with open(json_file.name, 'r') as file:
+        with open(json_file.name, 'r',encoding='utf-8') as file:
             json_data = json.load(file)
         df = get_comfyui_workflow()
         records = [x.strip() for x in import_records['key']]
@@ -77,6 +83,7 @@ def import_workflow(json_file, import_records, workflow_name):
         work_names = df['workflow'].unique().tolist()
         return f"Workflows imported successfully: {workflow_name}", gr.Dropdown(choices=work_names, interactive=True)
     except Exception as e:
+        print(e)
         return f"Error importing workflow: {workflow_name}", gr.Dropdown(choices=work_names, interactive=True)
 
 
@@ -109,13 +116,25 @@ def execute_workflow(api_input, workflow_name, edit_records):
     content = df[df['workflow'] == workflow_name]['content'].values[0]
     jsonobj = json.loads(ccf.base64_decode(content))
 
+    batchkey = ""
+    batchvalue = ""
     for index, row in edit_records.iterrows():
         key = row['key']
         value = row['value']
-        set_value_for_json(jsonobj, key, value)
-
-    # 调用api 发送json
-    queue_prompt(api_input, jsonobj)
+        if "string" == ccf.determine_type(value) and  ";" in value:
+            batchkey = key
+            batchvalue = value
+        else:
+            set_value_for_json(jsonobj, key, value)
+    if len(batchvalue) > 0:
+        values = batchvalue.split(";")
+        for value in values:
+            set_value_for_json(jsonobj, batchkey, value)
+            # 调用api 发送json
+            queue_prompt(api_input, jsonobj)
+    else:
+        queue_prompt(api_input, jsonobj)
+   
     return "发送成功"
 
 
@@ -125,17 +144,18 @@ def delete_workflow(workflow_name):
     df = df[df['workflow'] != workflow_name]
     conn = sqlite3.connect('data.db')
     df.to_sql('comfyui_workflow', conn, if_exists='replace', index=False)
-    return "删除成功"
+    work_names = df['workflow'].unique().tolist()
+    return "删除成功", gr.Dropdown(choices=work_names, interactive = True)
 
 
 # 导入/执行工作流单选框修改执行函数
 def change_show(value):
     if value == "导入工作流":
-        return gr.File(visible=True), gr.DateTime(visible=True), gr.Button(visible=True), gr.Button(visible=True), gr.Textbox(visible=True), gr.Button(visible=True), gr.Textbox(visible=False), gr.Dropdown(visible=False), gr.Dataframe(visible=False), gr.Button(visible=False), gr.Button(visible=False), gr.Textbox(visible=True, value="")
+        return gr.File(visible=True), gr.DateTime(visible=True), gr.Button(visible=True), gr.Button(visible=True), gr.Textbox(visible=True), gr.Button(visible=True), gr.Textbox(visible=False), gr.Dropdown(visible=False), gr.Dataframe(visible=False), gr.Button(visible=False), gr.Button(visible=False), gr.Button(visible=False), gr.Textbox(visible=True, value="")
     else:
         df = get_comfyui_workflow()
         work_names = df['workflow'].unique().tolist()
-        return gr.File(visible=False), gr.DateTime(visible=False), gr.Button(visible=False), gr.Button(visible=False), gr.Textbox(visible=False), gr.Button(visible=False), gr.Textbox(visible=True, interactive=True), gr.Dropdown(choices=work_names, visible=True), gr.Dataframe(visible=True), gr.Button(visible=True), gr.Button(visible=True), gr.Textbox(visible=True, value="")
+        return gr.File(visible=False), gr.DateTime(visible=False), gr.Button(visible=False), gr.Button(visible=False), gr.Textbox(visible=False), gr.Button(visible=False), gr.Textbox(visible=True, interactive=True), gr.Dropdown(choices=work_names, visible=True), gr.Dataframe(visible=True), gr.Button(visible=True), gr.Button(visible=True), gr.Button(visible=True), gr.Textbox(visible=True, value="")
 
 # 添加新行执行函数
 def add_record(inputs):
@@ -147,6 +167,11 @@ def add_record(inputs):
 def delete_record(inputs):
     records = [x for x in inputs['key']]
     return gr.DataFrame(value=pd.DataFrame({'key': records[:-1]}), headers=["key"], interactive=True)
+
+# 打开图片所在文件夹
+def open_folder():
+    folder_path = 'D:/ComfyUI_windows/ComfyUI_windows_portable/ComfyUI/output'
+    os.startfile(folder_path)
 
 
 
@@ -174,6 +199,8 @@ def func():
                 "运行工作流", visible=False, variant="primary")
         with gr.Column():
             delete_workflow_button = gr.Button("删除工作流", variant="primary",visible=False)
+        with gr.Column():
+            open_output_button = gr.Button("打开文件夹", variant="primary", visible=False)
     output = gr.Textbox(label="Output")
 
     import_button.click(import_workflow, inputs=[
@@ -186,11 +213,11 @@ def func():
                          api_input, workflow_list, edit_records], outputs=[output])
     
     delete_workflow_button.click(delete_workflow, inputs=[
-                                 workflow_list], outputs=[output])
+                                 workflow_list], outputs=[output, workflow_list])
 
 
     switch_show.change(change_show, [switch_show], [json_file_input, import_records, add_buttion, delete_button,
-                       workflow_name_input, import_button, api_input, workflow_list, edit_records, execute_button, delete_workflow_button, output])
+                       workflow_name_input, import_button, api_input, workflow_list, edit_records, execute_button, delete_workflow_button, open_output_button, output])
 
     # 添加新行
     add_buttion.click(add_record, inputs=[
@@ -199,3 +226,7 @@ def func():
     # 删除最后行
     delete_button.click(delete_record, inputs=[
                         import_records], outputs=[import_records])
+    
+    # 打开文件夹
+    open_output_button.click(open_folder, inputs=[], outputs=[])
+
