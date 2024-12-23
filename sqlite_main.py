@@ -35,8 +35,12 @@ def createTable():
     # software_accounts
     db.create_table('software_accounts',
                     'uuid TEXT, software_name TEXT, account TEXT, password TEXT, is_available TEXT, remark TEXT')
+    
+    # workflow_configs
+    db.create_table('workflow_configs',
+                    'workflow TEXT, inputDir TEXT, outputDir TEXT, functionName TEXT, funcParams TEXT, remark TEXT')
 
-
+    db.delete_table('workflow_configs')
 
 if __name__ == '__main__':
     createTable()

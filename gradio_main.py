@@ -1,5 +1,5 @@
 import gradio as gr
-from tabs import tab1_info, tab2_info, tab5_info, tab6_info, tab8_info, tab9_info, tab10_info, tab11_info, tab12_info, tab13_info
+from tabs import tab1_info, tab2_info, tab5_info, tab6_info, tab8_info, tab9_info, tab10_info, tab11_info, tab12_info, tab13_info, tab14_info, tab15_info
 import sys
 
 # 加载 .env 文件
@@ -29,6 +29,8 @@ if __name__ == "__main__":
                 tab8_info.func()
             with gr.Tab("提示词管理"):
                 tab9_info.func()
+            with gr.Tab("提示词优化工具"):
+                tab14_info.func()
             with gr.Tab("语音实验室"):
                 tab10_info.func()
             with gr.Tab("AZURE文本转语音"):
@@ -36,7 +38,9 @@ if __name__ == "__main__":
             with gr.Tab("PDF2EXCEL"):
                 tab12_info.func()
             with gr.Tab("comfyui工作流"):
-                tab13_info.func()             
+                tab13_info.func()   
+            with gr.Tab("工作流"):
+                tab15_info.func()
 
     # 若在google云盘启动  使用如下代码
     #app.launch(inbrowser=True, auth=login, share=True)
