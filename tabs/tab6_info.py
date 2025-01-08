@@ -43,6 +43,27 @@ def get_url_mappings():
     return urlMappingDF
 
 
+
+# 从备注中获取短链接并转为长链接并返回
+def get_long_url_from_remark(remark):
+    """
+     从备注中获取短链接并转为长链接并返回
+    """
+    # 从备注中提取短链接
+    short_url = ""
+    pattern = re.search(r'https?://[^\s;]+', remark)
+    if pattern:
+        short_url = pattern.group()
+        print(f"从备注中提取到的短链接为: {short_url}")
+
+    df_urlall = get_url_mappings()
+    urls = df_urlall[df_urlall['short_url']
+                     == short_url]['long_url'].tolist()
+
+    long_url = urls[0] if urls else short_url
+    return long_url
+
+
 def get_choice():
     # 获取所有在使用的软件
     df = get_accounts()
@@ -128,21 +149,27 @@ def update_input(selected_option):
     valid_email, valid_email_password, remark = get_email(selected_option)
 
     # 从备注中提取短链接
-    short_url = ""
-    pattern = re.search(r'https?://[^\s;]+', remark)
-    if pattern:
-        short_url = pattern.group()
-        print(f"从备注中提取到的短链接为: {short_url}")
+    long_url = get_long_url_from_remark(remark)
+    
+    return gr.Textbox(value=valid_email, interactive=True), gr.Textbox(value=valid_email_password, interactive=True), gr.Textbox(value=remark, interactive=True), gr.Button(link=long_url), gr.Radio(["可用", "不可用"], value="可用", interactive=True)
 
-    
-    df_urlall = get_url_mappings()
-    urls = df_urlall[df_urlall['short_url']
-                                   == short_url]['long_url'].tolist()
-    
-    long_url = urls[0] if urls else short_url
-    
-    return gr.Textbox(value=valid_email, interactive=True), gr.Textbox(value=valid_email_password, interactive=True), gr.Textbox(value=remark, interactive=True),gr.Button(link=long_url)
 
+# 单选框修改事件
+def radio_change(software_name, enable):
+
+    df_software = get_accounts()
+
+    filterDF = df_software[(df_software['software_name'] == software_name) & (
+        df_software['is_available'] == enable)]
+    if not filterDF.empty:
+        valid_email = filterDF['account'].tolist()[0]
+        valid_email_password = filterDF['password'].tolist()[0]
+        remark = filterDF['remark'].tolist()[0]
+        long_url = get_long_url_from_remark(remark)
+        return gr.Textbox(value=valid_email, interactive=True), gr.Textbox(value=valid_email_password, interactive=True), gr.Textbox(value=remark, interactive=True), gr.Button(link=long_url)
+    else:
+        return gr.Textbox(value='', interactive=True), gr.Textbox(value='', interactive=True), gr.Textbox(value='', interactive=True), gr.Button(link='')
+    
 
 def refresh_result():
     return gr.Dropdown(choices=get_choice(), interactive=True)
@@ -175,9 +202,13 @@ def search_result(software_name, account, password, enable, remark):
     '''
     df_software = get_accounts()
 
-    # 当前软件账号信息
-    dataDF = df_software[df_software['is_available']
-                         == enable]
+    # 根据查询条件筛选数据 目前支持是否可用和备注进行查询
+    if len(remark) > 0:
+        dataDF = df_software[(df_software['is_available']
+                              == enable) & (df_software['remark'].str.contains(remark))]
+    else:
+        dataDF = df_software[df_software['is_available']== enable]
+
     resultDF = dataDF[['software_name', 'account', 'password', 'is_available', 'remark']].rename(
         columns={'software_name': '软件名称', 'account': '账号', 'password': '密码', 'is_available': '是否可用', 'remark': '备注'})
 
@@ -207,7 +238,7 @@ def func():
         enable_radio = gr.Radio(["可用", "不可用"],
                                 label="选择是否可用  【查询会应用该选项】", value="可用")
  
-        input_remark = gr.Textbox(label="备注", interactive=True)
+        input_remark = gr.Textbox(label="备注  【查询会应用该选项】", interactive=True)
 
     with gr.Row():
         link_btn = gr.Button("打开软件网址", variant="primary",link="")
@@ -221,7 +252,11 @@ def func():
 
     # 设置下拉选项修改事件
     dropdown.change(fn=update_input, inputs=dropdown,
-                    outputs=[input_text, input_passwd, input_remark, link_btn])
+                    outputs=[input_text, input_passwd, input_remark, link_btn, enable_radio])
+    
+    # 单选框修改事件
+    enable_radio.change(fn=radio_change, inputs=[dropdown, enable_radio], outputs=[
+                        input_text, input_passwd, input_remark, link_btn])
     
     # 刷新按钮点击事件
     refresh_btn.click(fn=refresh_result, inputs=[],outputs=[dropdown])
@@ -230,6 +265,7 @@ def func():
     # 更新记录点击事件
     update_btn.click(fn=update_result,
                      inputs=[dropdown, input_text, input_passwd, enable_radio, input_remark], outputs=[output, download_file],)
+
 
     # 查询记录点击事件
     search_btn.click(fn=search_result,
